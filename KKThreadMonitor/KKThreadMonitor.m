@@ -9,8 +9,6 @@
 #import "KKThreadMonitor.h"
 #import "KKCallStack.h"
 #include <pthread/introspection.h>
-#import <mach/mach.h>
-
 
 #ifndef kk_dispatch_main_async_safe
 #define kk_dispatch_main_async_safe(block)\
@@ -23,8 +21,8 @@ if (dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL) == dispatch_queue_get
 
 static pthread_introspection_hook_t old_pthread_introspection_hook_t = NULL;
 static int threadCount = 0;
-#define KK_THRESHOLD 40
-static const int threadIncreaseThreshold = 10;
+#define KK_THRESHOLD 60
+static const int threadIncreaseThreshold = 20;
 
 //线程数量超过40，就会弹窗警告，并且控制台打印所有线程的堆栈；之后阈值每增加5条(45、50、55...)同样警告+打印堆栈；如果线程数量再次少于40条，阈值恢复到40
 static int maxThreadCountThreshold = KK_THRESHOLD;
@@ -34,24 +32,22 @@ static bool isMonitor = false;
 
 @implementation KKThreadMonitor
 
-+ (void)load
-{
-    old_pthread_introspection_hook_t = pthread_introspection_hook_install(kk_pthread_introspection_hook_t);
-    mach_msg_type_number_t count;
-    thread_act_array_t threads;
-    task_threads(mach_task_self(), &threads, &count);
-    threadCount = count;
-}
-
 + (void)startMonitor
 {
     global_semaphore = dispatch_semaphore_create(1);
+    dispatch_semaphore_wait(global_semaphore, DISPATCH_TIME_FOREVER);
+    mach_msg_type_number_t count;
+    thread_act_array_t threads;
+    task_threads(mach_task_self(), &threads, &count);
+    threadCount = count; //加解锁之间，保证线程的数量不变
+    old_pthread_introspection_hook_t = pthread_introspection_hook_install(kk_pthread_introspection_hook_t);
+    dispatch_semaphore_signal(global_semaphore);
+    
     isMonitor = true;
     kk_dispatch_main_async_safe(^{
         [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(clearThreadCountIncrease) userInfo:nil repeats:YES];
     });
 }
-
 + (void)clearThreadCountIncrease
 {
     threadCountIncrease = 0;
