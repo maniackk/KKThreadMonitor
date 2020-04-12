@@ -21,8 +21,8 @@ if (dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL) == dispatch_queue_get
 
 static pthread_introspection_hook_t old_pthread_introspection_hook_t = NULL;
 static int threadCount = 0;
-#define KK_THRESHOLD 60
-static const int threadIncreaseThreshold = 20;
+#define KK_THRESHOLD 40
+static const int threadIncreaseThreshold = 10;
 
 //线程数量超过40，就会弹窗警告，并且控制台打印所有线程的堆栈；之后阈值每增加5条(45、50、55...)同样警告+打印堆栈；如果线程数量再次少于40条，阈值恢复到40
 static int maxThreadCountThreshold = KK_THRESHOLD;
