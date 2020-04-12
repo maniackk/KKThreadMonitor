@@ -1,5 +1,5 @@
 # KKThreadMonitor
-轻量级线程监控工具，当线程数量过多或线程增长爆炸时候，就打印所有线程堆栈。
+轻量级线程监控工具，当线程数量过多或线程爆炸时候，就打印所有线程堆栈。
 
 # 效果
 当线程爆炸或线程数量过多时候，控制台打印所有的线程堆栈~
@@ -47,7 +47,7 @@ libdispatch.dylib              0x00001dfc _dispatch_call_block_and_release  +  3
 [KKThreadMonitor startMonitor];
 
 //在KKThreadMonitor.m文件里，可根据需求修改这两个值
-#define KK_THRESHOLD 40   //表示线程数量超过40，就打印所有线程堆栈
+#define KK_THRESHOLD 40   //表示线程数量超过40，就打印所有线程堆栈(根据自己项目来定！！！)
 static const int threadIncreaseThreshold = 10;  //表示一秒钟新增加的线程数量（新建的线程数量 - 销毁的线程数量）超过10，就打印所有的线程堆栈
 ```
 
