@@ -53,3 +53,6 @@ static const int threadIncreaseThreshold = 10;  //表示一秒钟新增加的线
 
 # 说明
 打印线程堆栈，我目前是用自己另外一个库[KKCallStack](https://github.com/maniackk/KKCallStack)。
+
+# 原理
+[博客](https://juejin.im/post/5e92a113e51d4547134bdadb)
